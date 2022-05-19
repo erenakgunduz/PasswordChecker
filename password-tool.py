@@ -10,7 +10,7 @@ import shutil
 import argparse
 
 
-lists = np.array(["lists/passwords.json", "lists/forenames.txt", "lists/surnames.txt"])
+lists = np.array(["lists/passwords.json", "lists/forenames.gz", "lists/surnames.gz"])
 refresh = 0
 
 
@@ -71,6 +71,21 @@ def collect_lists():
 
     worst_passwords = json.dumps(worst_passwords)
 
+    def html_extract(html):
+        soup = BeautifulSoup(html, "html.parser")
+        name_count = len(soup.find_all("td", class_="sur"))
+        print(name_count)
+        names = np.array([])
+        for name in range(name_count):
+            names = np.append(
+                names,
+                soup.find_all("td", class_="sur")[name].contents[0].get_text(),
+            )
+        return names
+
+    forenames = html_extract(content[1])
+    surnames = html_extract(content[2])
+
     cwd = os.getcwd()
     subdir = f"{cwd}/lists"
 
@@ -89,9 +104,9 @@ def collect_lists():
         with open(lists[0], "w") as f:
             f.write(worst_passwords)
         with open(lists[1], "w") as f:
-            f.write(content[1])
+            np.savetxt(lists[1], forenames, fmt="%s")
         with open(lists[2], "w") as f:
-            f.write(content[2])
+            np.savetxt(lists[2], surnames, fmt="%s")
 
 
 class StrengthLevel:
