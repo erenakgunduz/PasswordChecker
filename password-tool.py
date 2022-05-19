@@ -15,7 +15,6 @@ refresh = 0
 
 
 def check_4_lists():
-
     global refresh
     for listfile in lists:
         files_exist = os.path.exists(listfile)

@@ -1,6 +1,5 @@
 import numpy as np
 
-
 # Collected from the most common list for respective countries
 teamlist = np.array(
     [
