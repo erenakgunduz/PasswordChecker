@@ -102,68 +102,120 @@ def collect_lists():
     else:
         with open(lists[0], "w") as f:
             f.write(worst_passwords)
-        with open(lists[1], "w") as f:
+        with open(lists[1], "w"):
             np.savetxt(lists[1], forenames, fmt="%s")
-        with open(lists[2], "w") as f:
+        with open(lists[2], "w"):
             np.savetxt(lists[2], surnames, fmt="%s")
 
 
 class StrengthLevel:
-    def __init__(self, passwd, password_strength=None):
+    def __init__(self, passwd, feedback_id=None):
         self.passwd = passwd
-        self.password_strength = password_strength
+        self.feedback_id = feedback_id
 
 
 class VeryWeak(StrengthLevel):
     def __init__(self, passwd):
         super().__init__(passwd)
-        # Can be useful to develop incremental adjustments to strength level for tailored feedback
-        self.password_strength = 0
+        self.feedback_id = 0
+
+    def basics(self):
+        with open(lists[0], "r") as f:
+            w_passwords = f.read()
+        w_passwords = json.loads(w_passwords)
+        forenames = np.loadtxt(lists[1], delimiter="\t", dtype=str)
+        surnames = np.loadtxt(lists[2], delimiter="\t", dtype=str)
+        print(type(w_passwords))
+        print(forenames.shape)
+        print(surnames.shape)
+
+    def clubs(self):
+        return False
 
     def verdict(self):
-        return False
+        self.basics()
+        self.clubs()
+        if self.basics() is True or self.clubs() is True:
+            return True
+        else:
+            return False
 
 
 class Weak(StrengthLevel):
     def __init__(self, passwd):
         super().__init__(passwd)
+        self.feedback_id = 1
+
+    def contains(self):
+        return False
+
+    def length(self):
+        return True
 
     def verdict(self):
-        return False
+        self.contains()
+        self.length()
+        if self.contains() is True or self.length() is False:
+            return True
+        else:
+            return False
 
 
 class Decent(StrengthLevel):
     def __init__(self, passwd):
         super().__init__(passwd)
+        self.feedback_id = 2
+
+    def complexity(self):
+        return True
 
     def verdict(self):
-        return False
+        self.complexity()
+        if self.complexity() is False:
+            return True
+        else:
+            return False
 
 
 class Strong(StrengthLevel):
     def __init__(self, passwd):
         super().__init__(passwd)
 
+    def consecutive(self):
+        return False
+
     def verdict(self):
+        self.consecutive()
+        if self.consecutive() is True:
+            self.feedback_id = 3
+        else:
+            self.feedback_id = 4
         return True
 
 
-def strength_checker(p_test):
-    """Putting the polymorphic verdict() method to use"""
-    return p_test.verdict()
+def evaluation(bools, tests):
+    # Could also do feedback = lambda n: tests[n].feedback_id
+    # But not recommended to assign to lambda as it defeats the point
+    def feedback(n):
+        return tests[n].feedback_id
 
-
-def evaluation(bools):
     if bools[0] is True:
+        feedback(0)
         print("You have a very weak password")
     elif bools[1] is True:
+        feedback(1)
         print("You have a weak password")
     elif bools[2] is True:
-        print("You have an OK password that could be strong with some improvements")
+        feedback(2)
+        print(
+            "You have an OK password that could be much stronger with some improvements"
+        )
     elif bools[3] is True:
+        print(feedback(3))
         print("You have a strong password")
     else:
         print("Something ain't right")
+        exit()
 
 
 def easter_egg() -> str:
@@ -212,12 +264,11 @@ def main():
 
     scenarios = np.array([veryweak_p, weak_p, decent_p, strong_p])
 
-    results = []
-    for criteria in scenarios:
-        results.append(strength_checker(criteria))
+    # I love this line, I discuss it in the README
+    results = [(lambda p_test: p_test.verdict())(criteria) for criteria in scenarios]
 
     print(results)
-    evaluation(results)
+    evaluation(results, scenarios)
 
 
 if __name__ == "__main__":
