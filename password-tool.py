@@ -2,6 +2,7 @@ import os
 import json
 import requests
 from bs4 import BeautifulSoup
+from getpass import getpass
 import numpy as np
 import findentropy
 import scrapehelp
@@ -11,6 +12,7 @@ import argparse
 
 
 lists = np.array(["lists/passwords.json", "lists/forenames.gz", "lists/surnames.gz"])
+affirm = np.array(["yes", "yeah", "yea", "y"])
 refresh = 0
 
 
@@ -28,7 +30,7 @@ def check_4_lists():
                 refresh_p = input(
                     "List files exist. Would you like to refresh them? > "
                 )
-                if refresh_p.lower() in ["yes", "yeah", "yea", "y"]:
+                if refresh_p.lower() in affirm:
                     refresh += 1
                     break
                 else:
@@ -85,13 +87,12 @@ def collect_lists():
     forenames = html_extract(content[1])
     surnames = html_extract(content[2])
 
-    cwd = os.getcwd()
-    subdir = f"{cwd}/lists"
+    subdir = f"{os.getcwd()}/lists"
 
     try:
         if os.path.exists(subdir):
             confirm = input("Overwrite 'lists' directory? > ")
-            if confirm.lower() not in ["yes", "yeah", "yea", "y"]:
+            if confirm.lower() not in affirm:
                 print("Aborting.")
                 exit()
             shutil.rmtree(subdir)
@@ -109,9 +110,32 @@ def collect_lists():
 
 
 class StrengthLevel:
-    def __init__(self, passwd, feedback_id=None):
+    def __init__(
+        self, passwd, feedback_id=None, w_passwords=None, forenames=None, surnames=None
+    ):
         self.passwd = passwd
         self.feedback_id = feedback_id
+        self.w_passwords = w_passwords
+        self.forenames = forenames
+        self.surnames = surnames
+
+    def reader(self):
+        with open(lists[0], "r") as f:
+            self.w_passwords = f.read()
+        self.w_passwords = json.loads(self.w_passwords)
+        self.forenames = np.loadtxt(lists[1], delimiter="\t", dtype=str)
+        self.surnames = np.loadtxt(lists[2], delimiter="\t", dtype=str)
+
+    @staticmethod
+    def formatter(names):
+        names = np.char.lower(names)
+        names = np.char.replace(names, " ", "-")
+        return names
+
+    def grab(self):
+        self.reader()
+        self.forenames = self.formatter(self.forenames)
+        self.surnames = self.formatter(self.surnames)
 
 
 class VeryWeak(StrengthLevel):
@@ -120,25 +144,47 @@ class VeryWeak(StrengthLevel):
         self.feedback_id = 0
 
     def basics(self):
-        with open(lists[0], "r") as f:
-            w_passwords = f.read()
-        w_passwords = json.loads(w_passwords)
-        forenames = np.loadtxt(lists[1], delimiter="\t", dtype=str)
-        surnames = np.loadtxt(lists[2], delimiter="\t", dtype=str)
-        print(type(w_passwords))
-        print(forenames.shape)
-        print(surnames.shape)
+        """Does the password fail at any of the most basic considerations?"""
+        self.grab()
+
+        if len(self.passwd) < 5:
+            self.feedback_id = 0.05
+            return True
+        elif "password" in self.passwd.lower():
+            self.feedback_id = 0.1
+            return True
+        elif self.passwd.lower() in self.w_passwords:
+            self.feedback_id = 0.2
+            return True
+        elif (self.passwd.lower() in self.forenames) or (
+            self.passwd.lower() in self.surnames
+        ):
+            self.feedback_id = 0.3
+            return True
+        else:
+            return False
 
     def clubs(self):
+        """Is the password simply the name of a football/sports club or something related?"""
+        if self.passwd.lower() in sportsclubs.teamlist:
+            match self.passwd.lower():
+                case "tottenham" | "tottenham1":
+                    self.feedback_id = 0.4
+                case "liverpool" | "liverpool1":
+                    self.feedback_id = 0.5
+                case "arsenal" | "arsenal1":
+                    self.feedback_id = 0.6
+                case _:
+                    self.feedback_id = 0.7
+            return True
         return False
 
     def verdict(self):
         self.basics()
         self.clubs()
-        if self.basics() is True or self.clubs() is True:
+        if (self.basics() is True) or (self.clubs() is True):
             return True
-        else:
-            return False
+        return False
 
 
 class Weak(StrengthLevel):
@@ -146,19 +192,39 @@ class Weak(StrengthLevel):
         super().__init__(passwd)
         self.feedback_id = 1
 
-    def contains(self):
+    def length(self):
+        """Is the password's length inadequate?"""
+        if len(self.passwd) < 10:
+            self.feedback_id = 1.1
+            return True
         return False
 
-    def length(self):
-        return True
+    def contains(self):
+        """Does the password contain a personal or sports club name?"""
+        self.grab()
+        # Clean up very short names to prevent false positives here
+        self.forenames = np.array([name for name in self.forenames if len(name) >= 4])
+        self.surnames = np.array([name for name in self.surnames if len(name) >= 4])
+        # print(self.forenames.shape)
+        # print(self.surnames.shape)
 
-    def verdict(self):
-        self.contains()
-        self.length()
-        if self.contains() is True or self.length() is False:
+        if any(team in self.passwd.lower() for team in sportsclubs.teamlist):
+            self.feedback_id = 1.2
+            return True
+        elif any(name in self.passwd.lower() for name in self.forenames) or any(
+            name in self.passwd.lower() for name in self.surnames
+        ):
+            self.feedback_id = 1.3
             return True
         else:
             return False
+
+    def verdict(self):
+        self.length()
+        self.contains()
+        if (self.length() is True) or (self.contains() is True):
+            return True
+        return False
 
 
 class Decent(StrengthLevel):
@@ -167,14 +233,14 @@ class Decent(StrengthLevel):
         self.feedback_id = 2
 
     def complexity(self):
+        """Does the password exhibit a good complexity?"""
         return True
 
     def verdict(self):
         self.complexity()
         if self.complexity() is False:
             return True
-        else:
-            return False
+        return False
 
 
 class Strong(StrengthLevel):
@@ -182,6 +248,7 @@ class Strong(StrengthLevel):
         super().__init__(passwd)
 
     def consecutive(self):
+        """Does the password contain a bad sequence?"""
         return False
 
     def verdict(self):
@@ -200,13 +267,13 @@ def evaluation(bools, tests):
         return tests[n].feedback_id
 
     if bools[0] is True:
-        feedback(0)
+        print(feedback(0))
         print("You have a very weak password")
     elif bools[1] is True:
-        feedback(1)
+        print(feedback(1))
         print("You have a weak password")
     elif bools[2] is True:
-        feedback(2)
+        print(feedback(2))
         print(
             "You have an OK password that could be much stronger with some improvements"
         )
@@ -218,9 +285,10 @@ def evaluation(bools, tests):
         exit()
 
 
-def easter_egg() -> str:
-    print(f"{(sportsclubs.teamlist[4]).capitalize()} get battered everywhere they go")
-    return "COYS"
+def amazing_fact() -> str:
+    """Shoutout Bonzi"""
+    print(f"{sportsclubs.teamlist[4].capitalize()} get battered everywhere they go")
+    return "COYS ;)"
 
 
 def main():
@@ -245,7 +313,7 @@ def main():
         collect_lists()
 
     if password is None:
-        password = input("Password you'd like to test: ")
+        password = getpass("Password you'd like to test: ")
     else:
         password = args.test[0]
 
@@ -269,6 +337,16 @@ def main():
 
     print(results)
     evaluation(results, scenarios)
+
+    caches = f"{os.getcwd()}/__pycache__"
+    if os.path.exists(caches):
+        rm_cache = input("Found Python cache. Do you want to clear it? > ")
+        if rm_cache.lower() in affirm:
+            shutil.rmtree(caches)
+
+    if args.test is None:
+        if input("Go again? > ").lower() in affirm:
+            main()
 
 
 if __name__ == "__main__":
