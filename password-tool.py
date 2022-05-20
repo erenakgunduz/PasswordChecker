@@ -232,7 +232,26 @@ class Decent(StrengthLevel):
 
     def complexity(self):
         """Does the password exhibit a good complexity?"""
-        return True
+        length = len(self.passwd) >= 12
+        mixed_case = not self.passwd.islower() and not self.passwd.isupper()
+        symbols = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+        mixed_cset = not self.passwd.isalnum() and any(
+            c in symbols for c in self.passwd
+        )
+        p_entropy = findentropy.EntropyCalculate(self.passwd)
+        entropy_good = p_entropy.entropy() >= 60
+
+        if not length:
+            self.feedback_id = 2.1
+            return False
+        elif not mixed_case and not mixed_cset:
+            self.feedback_id = 2.2
+            return False
+        elif not entropy_good:
+            self.feedback_id = 2.3
+            return False
+        else:
+            return True
 
     def verdict(self):
         self.complexity()
