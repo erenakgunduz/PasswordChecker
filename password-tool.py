@@ -11,8 +11,8 @@ import shutil
 import argparse
 
 
-lists = np.array(["lists/passwords.json", "lists/forenames.gz", "lists/surnames.gz"])
-affirm = np.array(["yes", "yeah", "yea", "y"])
+lists = ("lists/passwords.json", "lists/forenames.gz", "lists/surnames.gz")
+affirm = ("yes", "yeah", "yea", "y")
 refresh = 0
 
 
@@ -39,12 +39,10 @@ def check_4_lists():
 
 
 def collect_lists():
-    urls = np.array(
-        [
-            "https://nordpass.com/json-data/top-worst-passwords/findings/all.json",
-            "https://forebears.io/earth/forenames",
-            "https://forebears.io/earth/surnames",
-        ]
+    urls = (
+        "https://nordpass.com/json-data/top-worst-passwords/findings/all.json",
+        "https://forebears.io/earth/forenames",
+        "https://forebears.io/earth/surnames",
     )
 
     headers = scrapehelp.headers
