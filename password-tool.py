@@ -2,6 +2,9 @@ import os
 import re
 import json
 import requests
+import cProfile
+import pstats
+from abc import abstractmethod
 from bs4 import BeautifulSoup
 from getpass import getpass
 import numpy as np
@@ -135,6 +138,10 @@ class StrengthLevel:
         self.reader()
         self.forenames = self.formatter(self.forenames)
         self.surnames = self.formatter(self.surnames)
+
+    @abstractmethod
+    def verdict(self):
+        pass
 
 
 class VeryWeak(StrengthLevel):
@@ -353,6 +360,14 @@ def main():
 
     args = parser.parse_args()
     password = args.test
+
+    # def profiler():
+    #     with cProfile.Profile() as pr:
+    #         collect_lists()
+    #     stats = pstats.Stats(pr)
+    #     stats.sort_stats(pstats.SortKey.TIME)
+    #     stats.print_stats()
+    # profiler()
 
     while check_4_lists() is False:
         collect_lists()
