@@ -31,8 +31,8 @@ def check_4_lists():
                 refresh_p = input(
                     "List files exist. Would you like to refresh them? > "
                 )
+                refresh += 1
                 if refresh_p.lower() in affirm:
-                    refresh += 1
                     break
                 else:
                     return True
@@ -310,19 +310,21 @@ def evaluation(bools, tests):
         return tests[n].feedback_id
 
     if bools[0] is True:
-        print(feedback(0))
-        print("You have a very weak password")
+        match feedback(0):
+            case _:
+                pass
     elif bools[1] is True:
-        print(feedback(1))
-        print("You have a weak password")
+        match feedback(1):
+            case _:
+                pass
     elif bools[2] is True:
-        print(feedback(2))
-        print(
-            "You have an OK password that could be much stronger with some improvements"
-        )
+        match feedback(2):
+            case _:
+                pass
     elif bools[3] is True:
-        print(feedback(3))
-        print("You have a strong password")
+        match feedback(3):
+            case _:
+                pass
     else:
         print("Something ain't right")
         exit()
@@ -373,7 +375,7 @@ def main():
     decent_p = Decent(password)
     strong_p = Strong(password)
 
-    scenarios = np.array([veryweak_p, weak_p, decent_p, strong_p])
+    scenarios = (veryweak_p, weak_p, decent_p, strong_p)
 
     # I love this line, I discuss it in the README
     results = [(lambda p_test: p_test.verdict())(criteria) for criteria in scenarios]

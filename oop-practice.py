@@ -22,9 +22,11 @@ class VeryWeak(StrengthLevel):
     def testing(self):
         return self.some_var
 
-    # Class methods can be helpful for some things, such as creating more "copies" (instances) of the class like so
+    # Can also do it with the cls parameter
+    # Class methods can be especially helpful for certain things, like creating more "copies" (instances) of the class:
     @classmethod
     def insert(cls):
+        print(f"This is the {cls.some_var}")
         return cls("thispasswdisveryweak")
 
     # Easiest to understand, still can be helpful for encapsulation
