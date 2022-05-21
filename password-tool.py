@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import requests
 from bs4 import BeautifulSoup
@@ -168,7 +169,7 @@ class VeryWeak(StrengthLevel):
             match self.passwd.lower():
                 case "tottenham" | "tottenham1":
                     self.feedback_id = 0.4
-                case "liverpool" | "liverpool1":
+                case "liverpool1":
                     self.feedback_id = 0.5
                 case "arsenal" | "arsenal1":
                     self.feedback_id = 0.6
@@ -200,11 +201,11 @@ class Weak(StrengthLevel):
     def contains(self):
         """Does the password contain a personal or sports club name?"""
         self.grab()
-        # Clean up very short names to prevent false positives here
-        self.forenames = np.array([name for name in self.forenames if len(name) >= 4])
-        self.surnames = np.array([name for name in self.surnames if len(name) >= 4])
-        # print(self.forenames.shape)
-        # print(self.surnames.shape)
+        # Clean up short names to prevent false positives here
+        self.forenames = np.array([name for name in self.forenames if len(name) >= 5])
+        self.surnames = np.array([name for name in self.surnames if len(name) >= 5])
+        print(self.forenames.shape)
+        print(self.surnames.shape)
 
         if any(team in self.passwd.lower() for team in sportsclubs.teamlist):
             self.feedback_id = 1.2
@@ -233,25 +234,38 @@ class Decent(StrengthLevel):
     def complexity(self):
         """Does the password exhibit a good complexity?"""
         length = len(self.passwd) >= 12
+        just_num = self.passwd.isdigit()
         mixed_case = not self.passwd.islower() and not self.passwd.isupper()
         symbols = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
         mixed_cset = not self.passwd.isalnum() and any(
             c in symbols for c in self.passwd
         )
         p_entropy = findentropy.EntropyCalculate(self.passwd)
+        entropy_bad = p_entropy.entropy() < 24
         entropy_good = p_entropy.entropy() >= 60
 
-        if not length:
-            self.feedback_id = 2.1
-            return False
-        elif not mixed_case and not mixed_cset:
-            self.feedback_id = 2.2
-            return False
-        elif not entropy_good:
-            self.feedback_id = 2.3
-            return False
-        else:
-            return True
+        try:
+            if not length:
+                self.feedback_id = 2.1
+                return False
+            elif just_num:
+                self.feedback_id = 2.2
+                return False
+            elif not mixed_case and not mixed_cset:
+                self.feedback_id = 2.3
+                return False
+            elif entropy_bad:
+                self.feedback_id = 2.4
+                return False
+            elif not entropy_good:
+                self.feedback_id = 2.5
+                return False
+            else:
+                return True
+        finally:
+            print(p_entropy.entropy())
+            print(p_entropy.avg_entropy())
+            del p_entropy.string
 
     def verdict(self):
         self.complexity()
@@ -266,14 +280,26 @@ class Strong(StrengthLevel):
 
     def consecutive(self):
         """Does the password contain a bad sequence?"""
+        if re.search(r"(.)\1{3}", self.passwd):
+            self.feedback_id = 3.1
+            return True
+        elif re.search(r"\d{4}", self.passwd):
+            self.feedback_id = 3.2
+            return True
+        else:
+            self.feedback_id = 4
+            return False
+
+    def length(self):
+        """Is the password long? (20 chars or more)"""
+        if len(self.passwd) >= 20:
+            return True
         return False
 
     def verdict(self):
         self.consecutive()
-        if self.consecutive() is True:
-            self.feedback_id = 3
-        else:
-            self.feedback_id = 4
+        if (self.consecutive() is False) and (self.length() is True):
+            self.feedback_id = 5
         return True
 
 
