@@ -13,6 +13,7 @@ import scrapehelp
 import sportsclubs
 import shutil
 import argparse
+import logging
 
 
 lists = ("lists/passwords.json", "lists/forenames.gz", "lists/surnames.gz")
@@ -50,7 +51,7 @@ def collect_lists():
     )
 
     headers = scrapehelp.headers
-    print(headers)
+    logging.debug(headers)
 
     status = []
     content = np.array([])
@@ -59,10 +60,10 @@ def collect_lists():
         status.append(response.status_code)
         content = np.append(content, response.text)
 
-    print(status)
+    logging.debug(status)
     match status:
         case [200, 200, 200]:
-            print("Good 2 go")
+            logging.debug("Good 2 go")
         case _:
             print("Couldn't get all the lists. Try again :)")
             exit()
@@ -158,6 +159,11 @@ class VeryWeak(StrengthLevel):
     def basics(self):
         """Does the password fail at any of the most basic considerations?"""
         self.grab()
+        logging.debug(len(self.w_passwords))
+        logging.debug(type(self.w_passwords))
+        logging.debug(sportsclubs.teamlist.shape)
+        logging.debug(self.forenames.shape)
+        logging.debug(self.surnames.shape)
 
         if len(self.passwd) < 5:
             self.feedback_id = 0.05
@@ -217,8 +223,8 @@ class Weak(StrengthLevel):
         # Clean up short names to prevent false positives here
         self.forenames = np.array([name for name in self.forenames if len(name) >= 5])
         self.surnames = np.array([name for name in self.surnames if len(name) >= 5])
-        print(self.forenames.shape)
-        print(self.surnames.shape)
+        logging.debug(self.forenames.shape)
+        logging.debug(self.surnames.shape)
 
         if any(team in self.passwd.lower() for team in sportsclubs.teamlist):
             self.feedback_id = 1.2
@@ -276,8 +282,9 @@ class Decent(StrengthLevel):
             else:
                 return True
         finally:
-            print(p_entropy.entropy())
-            print(p_entropy.avg_entropy())
+            logging.debug(p_entropy.entropy())
+            logging.debug(p_entropy.entropy_ideal())
+            logging.debug(p_entropy.avg_entropy())
             del p_entropy.string
 
     def verdict(self):
@@ -323,18 +330,22 @@ def evaluation(bools, tests):
         return tests[n].feedback_id
 
     if bools[0] is True:
+        logging.debug(feedback(0))
         match feedback(0):
             case _:
                 pass
     elif bools[1] is True:
+        logging.debug(feedback(1))
         match feedback(1):
             case _:
                 pass
     elif bools[2] is True:
+        logging.debug(feedback(2))
         match feedback(2):
             case _:
                 pass
     elif bools[3] is True:
+        logging.debug(feedback(3))
         match feedback(3):
             case _:
                 pass
@@ -367,6 +378,10 @@ def main():
     args = parser.parse_args()
     password = args.test
 
+    level = logging.DEBUG
+    fmt = "[%(levelname)s] %(message)s"
+    logging.basicConfig(level=level, format=fmt)
+
     while check_4_lists() is False:
         collect_lists()
 
@@ -376,8 +391,8 @@ def main():
         password = args.test[0]
 
     password = password.strip()
-    print(password)
-    print(type(password))
+    logging.debug(password)
+    logging.debug(type(password))
 
     if " " in password:
         print("Not valid. Come again :)")
@@ -393,7 +408,7 @@ def main():
     # I love this line, I discuss it in the README
     results = [(lambda p_test: p_test.verdict())(criteria) for criteria in scenarios]
 
-    print(results)
+    logging.debug(results)
     evaluation(results, scenarios)
 
     caches = f"{os.getcwd()}/__pycache__"
