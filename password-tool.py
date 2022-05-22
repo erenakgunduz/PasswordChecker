@@ -2,9 +2,7 @@ import os
 import re
 import json
 import requests
-import cProfile
-import pstats
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup
 from getpass import getpass
 import numpy as np
@@ -111,7 +109,7 @@ def collect_lists():
             np.savetxt(lists[2], surnames, fmt="%s")
 
 
-class StrengthLevel:
+class StrengthLevel(ABC):
     def __init__(
         self, passwd, feedback_id=None, w_passwords=None, forenames=None, surnames=None
     ):
@@ -360,14 +358,6 @@ def main():
 
     args = parser.parse_args()
     password = args.test
-
-    # def profiler():
-    #     with cProfile.Profile() as pr:
-    #         collect_lists()
-    #     stats = pstats.Stats(pr)
-    #     stats.sort_stats(pstats.SortKey.TIME)
-    #     stats.print_stats()
-    # profiler()
 
     while check_4_lists() is False:
         collect_lists()
