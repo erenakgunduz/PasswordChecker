@@ -548,7 +548,7 @@ def main():
     password = args.test
 
     fmt = "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s"
-    logging.basicConfig(level=logging.DEBUG, format=fmt)
+    logging.basicConfig(level=logging.ERROR, format=fmt)
 
     while check_4_lists() is False:
         collect_lists()
