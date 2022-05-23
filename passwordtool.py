@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import json
 import lxml
 import cchardet
@@ -50,6 +51,8 @@ def collect_lists():
         "https://forebears.io/earth/surnames",
     )
 
+    logging.debug(sys.getsizeof(urls))
+
     headers = scrapehelp.headers
     logging.debug(headers)
 
@@ -60,13 +63,12 @@ def collect_lists():
         status.append(response.status_code)
         content = np.append(content, response.text)
 
-    logging.debug(status)
+    logging.info(status)
     match status:
         case [200, 200, 200]:
-            logging.debug("Good 2 go")
+            logging.info("Good 2 go")
         case _:
-            print("Couldn't get all the lists. Try again :)")
-            exit()
+            sys.exit("Couldn't get all the lists. Try again :)")
 
     worst_passwords = {}
     json_list = json.loads(content[0])
@@ -95,13 +97,11 @@ def collect_lists():
         if os.path.exists(subdir):
             confirm = input("Overwrite 'lists' directory? > ")
             if confirm.lower() not in affirm:
-                print("Aborting.")
-                exit()
+                sys.exit("Aborting.")
             shutil.rmtree(subdir)
         os.mkdir(subdir)
     except OSError:
-        print("Something went wrong in the process of generating 'lists/' :/")
-        exit()
+        sys.exit("Something went wrong in the process of generating 'lists/' :/")
     else:
         with open(lists[0], "w") as f:
             f.write(worst_passwords)
@@ -329,29 +329,74 @@ def evaluation(bools, tests):
     def feedback(n):
         return tests[n].feedback_id
 
+    # Already implicity returns None, use annotation to make it known "this is like a procedure, should return nothing"
+    def error_message() -> None:
+        logging.info(bools)
+        logging.error("No valid feedback ID")
+        sys.exit("Something ain't right")
+
     if bools[0] is True:
         logging.debug(feedback(0))
         match feedback(0):
-            case _:
+            case 0.05:
                 pass
+            case 0.1:
+                pass
+            case 0.2:
+                pass
+            case 0.3:
+                pass
+            case 0.4:
+                pass
+            case 0.5:
+                pass
+            case 0.6:
+                pass
+            case 0.7:
+                pass
+            case _:
+                error_message()
     elif bools[1] is True:
         logging.debug(feedback(1))
         match feedback(1):
-            case _:
+            case 1.1:
                 pass
+            case 1.2:
+                pass
+            case 1.3:
+                pass
+            case _:
+                error_message()
     elif bools[2] is True:
         logging.debug(feedback(2))
         match feedback(2):
-            case _:
+            case 2.1:
                 pass
+            case 2.2:
+                pass
+            case 2.3:
+                pass
+            case 2.4:
+                pass
+            case 2.5:
+                pass
+            case _:
+                error_message()
     elif bools[3] is True:
         logging.debug(feedback(3))
         match feedback(3):
-            case _:
+            case 3.1:
                 pass
+            case 3.2:
+                pass
+            case 4:
+                pass
+            case 5:
+                pass
+            case _:
+                error_message()
     else:
-        print("Something ain't right")
-        exit()
+        error_message()
 
 
 def amazing_fact() -> str:
@@ -378,9 +423,8 @@ def main():
     args = parser.parse_args()
     password = args.test
 
-    level = logging.DEBUG
-    fmt = "[%(levelname)s] %(message)s"
-    logging.basicConfig(level=level, format=fmt)
+    fmt = "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s"
+    logging.basicConfig(level=logging.DEBUG, format=fmt)
 
     while check_4_lists() is False:
         collect_lists()
@@ -395,8 +439,7 @@ def main():
     logging.debug(type(password))
 
     if " " in password:
-        print("Not valid. Come again :)")
-        exit()
+        sys.exit("Not valid. Come again :)")
 
     veryweak_p = VeryWeak(password)
     weak_p = Weak(password)
