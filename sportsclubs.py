@@ -79,5 +79,14 @@ teamlist = np.array(
         "olimpiakos",
         "olympiakos",
         "panathinaikos",
+        "marcelo",
+        "flamengo",
+        "santos",
+        "saopaulo",
+        "palmeiras",
+        "cruzeiro",
+        "gremio",
+        "botafogo",
+        "tricolor",
     ]
 )

@@ -172,7 +172,11 @@ class VeryWeak(StrengthLevel):
             self.feedback_id = 0.1
             return True
         elif self.passwd.lower() in self.w_passwords:
-            self.feedback_id = 0.2
+            match self.passwd.lower():
+                case "liverpool":
+                    self.feedback_id = 0.5
+                case _:
+                    self.feedback_id = 0.2
             return True
         elif (self.passwd.lower() in self.forenames) or (
             self.passwd.lower() in self.surnames
@@ -192,8 +196,10 @@ class VeryWeak(StrengthLevel):
                     self.feedback_id = 0.5
                 case "arsenal" | "arsenal1":
                     self.feedback_id = 0.6
-                case _:
+                case "ronaldo7":
                     self.feedback_id = 0.7
+                case _:
+                    self.feedback_id = 0.8
             return True
         return False
 
@@ -260,6 +266,7 @@ class Decent(StrengthLevel):
             c in symbols for c in self.passwd
         )
         p_entropy = findentropy.EntropyCalculate(self.passwd)
+        entropy_awful = p_entropy.entropy() < 8
         entropy_bad = p_entropy.entropy() < 24
         entropy_good = p_entropy.entropy() >= 60
 
@@ -267,17 +274,20 @@ class Decent(StrengthLevel):
             if not length:
                 self.feedback_id = 2.1
                 return False
-            elif just_num:
+            elif entropy_awful:
                 self.feedback_id = 2.2
                 return False
-            elif not mixed_case and not mixed_cset:
+            elif just_num:
                 self.feedback_id = 2.3
                 return False
-            elif entropy_bad:
+            elif not mixed_case and not mixed_cset:
                 self.feedback_id = 2.4
                 return False
-            elif not entropy_good:
+            elif entropy_bad:
                 self.feedback_id = 2.5
+                return False
+            elif not entropy_good:
+                self.feedback_id = 2.6
                 return False
             else:
                 return True
@@ -337,62 +347,176 @@ def evaluation(bools, tests):
 
     if bools[0] is True:
         logging.debug(feedback(0))
+        print("Password strength: Very weak")
+        sportsteam = (
+            "It seems your password is simply a football or sports club/related to one. This is a bad idea.\n",
+            "These were collected from the most common lists for their respective countries.\n",
+            "Someone who already knows which team you support could likely guess it very easily.\n",
+            "We advise you to use something else :)",
+        )
         match feedback(0):
             case 0.05:
-                pass
+                print("Your password is far too short (less than 5 characters)")
+                print(
+                    "Consider using one that's much longer - we recommend at least 12 characters for the length."
+                )
             case 0.1:
-                pass
+                print("Your password contains the word 'password'")
+                print(
+                    "This is always a bad idea, as it's one of the first things anyone would guess."
+                )
+                print("We suggest you don't include that word at all.")
             case 0.2:
-                pass
+                passwd = tests[0].passwd.lower()
+                print(
+                    "Your password is on the 2021 list for the top 200 most common passwords worldwide."
+                )
+                print(
+                    f"The password '{passwd}' can be cracked in {tests[0].w_passwords[passwd]}!"
+                )
+                print(
+                    "You should come up with a different one & change it if you use it IMMEDIATELY :)"
+                )
             case 0.3:
-                pass
+                print(
+                    "Your password appears to be just a personal name. This is always bad."
+                )
+                print(
+                    "When it comes to passwords, make sure they contain no personal information."
+                )
+                print(
+                    "This includes things such as name, email address, phone or social security #, etc. (Source: Harvard guidelines)"
+                )
             case 0.4:
-                pass
+                print("".join(sportsteam))
+                print("Also, let's never forget:")
+                print(amazing_fact())
             case 0.5:
-                pass
+                print("".join(sportsteam))
+                print(
+                    f"'{sportsclubs.teamlist[0]}' in particular is one of the top 200 most common passwords in the entire world!"
+                )
+                print(
+                    "YNWA, because you alone won't be accessing your accounts if that's actually your password for anything ;D"
+                )
             case 0.6:
-                pass
+                print("".join(sportsteam))
+                if (
+                    input("By the way, would you like to hear an amazing fact? > ")
+                    in affirm
+                ):
+                    amazing_fact()
             case 0.7:
-                pass
+                print("".join(sportsteam))
+                print("SIUUUUUUUU")
+            case 0.8:
+                print("".join(sportsteam))
             case _:
                 error_message()
     elif bools[1] is True:
         logging.debug(feedback(1))
+        print("Password strength: Weak")
         match feedback(1):
             case 1.1:
-                pass
+                print(
+                    "Though your password seems to not fail the very basics, it is still too short."
+                )
+                print(
+                    "We recommend at least 12 characters - for these purposes more is better."
+                )
             case 1.2:
-                pass
+                print(
+                    "Your password seems to contain a football/sports club or something related."
+                )
+                print(
+                    "Since this can make it easier for someone who knows you to crack it, you should avoid this."
+                )
             case 1.3:
-                pass
+                print("Your password appears to contain a personal name.")
+                print("It is definitely best to avoid this for a number of reasons.")
             case _:
                 error_message()
     elif bools[2] is True:
         logging.debug(feedback(2))
+        print("Password strength: OK")
         match feedback(2):
             case 2.1:
-                pass
+                print("(Maybe)")
+                print("Your password is a bit on the shorter side.")
+                print(
+                    "To achieve good complexity, consider making it at least a little longer."
+                )
             case 2.2:
-                pass
+                print("(Sike it's actually not OK)")
+                print("It seems your password has a very poor entropy.")
+                print(
+                    "You can think of it as a calculation of the unpredictability of your password's contents."
+                )
+                print("As it is now, it would most likely be very easy to crack.")
+                print("Use something more creative instead :)")
             case 2.3:
-                pass
+                print(
+                    "Your password appears to be composed of only digits. This is typically not a good idea."
+                )
+                print(
+                    "You can add some more variety to make it not only easier to remember, but also stronger."
+                )
             case 2.4:
-                pass
+                print(
+                    "Your password contains only one case of letters. It may or may not contain numbers too."
+                )
+                print(
+                    "However, with some small changes you could seriously improve it."
+                )
+                print(
+                    "By that, we mean to consider also using mixed case and/or special characters."
+                )
             case 2.5:
-                pass
+                print("(Not really)")
+                print("Your password has a poor entropy.")
+                print("Try spicing it up a little.")
+            case 2.6:
+                print(
+                    "Though your password seems OK for the most part, the entropy isn't quite as high as we want."
+                )
+                print(
+                    "To reach a level where your password is truly solid, try adding just a few more things to it."
+                )
             case _:
                 error_message()
     elif bools[3] is True:
         logging.debug(feedback(3))
+        print("Password strength: Strong")
+        harvardkey = "It's best to avoid this (Source: HarvardKey)."
         match feedback(3):
             case 3.1:
-                pass
+                print("Your password is probably strong as is.")
+                print(
+                    "However, it contains a sequence of the same character four consecutive times."
+                )
+                print(harvardkey)
             case 3.2:
-                pass
+                print("Your password is probably strong as is.")
+                print("However, it contains a sequence of four digits back to back.")
+                print(harvardkey)
             case 4:
-                pass
+                print(
+                    "Congratulations, it seems your password is probably a strong one by all means!"
+                )
+                print(
+                    "That said, one thing that could help you achieve maximum strength is for it to be even longer."
+                )
+                print(
+                    "One great way to achieve this and still be able to remember it is to use a passphrase! (Source: Harvard)"
+                )
             case 5:
-                pass
+                print("Congratulations, you seem to have a rather strong password!")
+                print(
+                    "If you are using a passphrase, that is a great strategy. Good thinking!"
+                )
+                print(
+                    "Otherwise, it would be a good idea to use a password manager so you don't lose/forget this."
+                )
             case _:
                 error_message()
     else:
@@ -401,8 +525,8 @@ def evaluation(bools, tests):
 
 def amazing_fact() -> str:
     """Shoutout Bonzi"""
-    print(f"{sportsclubs.teamlist[4].capitalize()} get battered everywhere they go")
-    return "COYS ;)"
+    print(f"{sportsclubs.teamlist[4].capitalize()} get battered everywhere they go 😈")
+    return "⚪ COYS ⚪ ;)"
 
 
 def main():
