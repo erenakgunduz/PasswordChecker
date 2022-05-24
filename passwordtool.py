@@ -343,7 +343,7 @@ def evaluation(bools, tests):
     def feedback(n):
         return tests[n].feedback_id
 
-    # Already implicity returns None, use annotation to make it known "this is like a procedure, should return nothing"
+    # Already implicitly returns None, use annotation to make it known "this is like a procedure, should return nothing"
     def error_message() -> None:
         logging.info(bools)
         logging.error("No valid feedback ID")
