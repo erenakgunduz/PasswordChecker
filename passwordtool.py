@@ -4,7 +4,8 @@ import sys
 import json
 import lxml
 import cchardet
-import requests
+import httpx
+import asyncio
 from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup, SoupStrainer
 from getpass import getpass
@@ -44,7 +45,7 @@ def check_4_lists():
     return False
 
 
-def collect_lists():
+async def collect_lists():
     urls = (
         "https://nordpass.com/json-data/top-worst-passwords/findings/all.json",
         "https://forebears.io/earth/forenames",
@@ -56,12 +57,13 @@ def collect_lists():
     headers = scrapehelp.headers
     logging.debug(headers)
 
-    status = []
-    content = np.array([])
-    for url in urls:
-        response = requests.get(url, allow_redirects=True, headers=headers)
-        status.append(response.status_code)
-        content = np.append(content, response.text)
+    async with httpx.AsyncClient() as client:
+        tasks = (
+            client.get(url, follow_redirects=True, headers=headers) for url in urls
+        )
+        reqs = await asyncio.gather(*tasks)
+        status = [response.status_code for response in reqs]
+        content = np.array([response.text for response in reqs])
 
     logging.info(status)
     match status:
@@ -555,7 +557,7 @@ def main():
     logging.basicConfig(level=logging.ERROR, format=fmt)
 
     while check_4_lists() is False:
-        collect_lists()
+        asyncio.run(collect_lists())
 
     if password is None:
         password = getpass("Password you'd like to test: ")
