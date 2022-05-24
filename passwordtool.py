@@ -112,6 +112,8 @@ def collect_lists():
 
 
 class StrengthLevel(ABC):
+    # Abstract class to enforce overwrite of verdict() in subclasses
+    # Slots for performance boost because more attributes won't be added, rather than dictionary as is default
     __slots__ = "passwd", "feedback_id", "w_passwords", "forenames", "surnames"
 
     def __init__(
@@ -402,7 +404,9 @@ def evaluation(bools, tests):
             case 0.6:
                 print("".join(sportsteam))
                 if (
-                    input("By the way, would you like to hear an amazing fact? > ")
+                    input(
+                        "By the way, would you like to hear an amazing fact? > "
+                    ).lower()
                     in affirm
                 ):
                     amazing_fact()
