@@ -72,21 +72,24 @@ async def collect_lists():
         case _:
             sys.exit("Couldn't get all the lists. Try again :)")
 
+    log_values = False
     worst_passwords = {}
     json_list = json.loads(content[0])
-    for i in range(len(json_list)):
+    for i, val in enumerate(json_list):
+        if log_values:
+            logging.debug(val)
         worst_passwords[json_list[i]["Password"]] = json_list[i]["Time_to_crack"]
 
     worst_passwords = json.dumps(worst_passwords)
 
-    # Using range(len()) idiom here and above to iterate through just integers until total amount reached
-    # enumerate() returns tuple as there are several layers of nesting involved, so not helpful for these cases
     def html_extract(html):
         strainer = SoupStrainer("td", attrs={"class": "sur"})
         soup = BeautifulSoup(html, "lxml", parse_only=strainer)
         get_names = soup.find_all("td", class_="sur")
         names = np.array([])
-        for name in range(len(get_names)):
+        for name, val in enumerate(get_names):
+            if log_values:
+                logging.debug(val)
             names = np.append(names, get_names[name].contents[0].get_text())
         return names
 
