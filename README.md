@@ -18,7 +18,7 @@ for criteria in scenarios:
     results.append(strength_checker(criteria))
 ```
 
-Using just this one line (line 582):
+Using just this one line (line 585):
 
 ```python
 results = [(lambda p_test: p_test.verdict())(criteria) for criteria in scenarios]
