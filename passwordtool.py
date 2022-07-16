@@ -27,7 +27,7 @@ def check_4_lists():
     global refresh
     for listfile in lists:
         files_exist = os.path.exists(listfile)
-        if files_exist is False:
+        if not files_exist:
             refresh += 1
             break
         else:
@@ -213,7 +213,7 @@ class VeryWeak(StrengthLevel):
     def verdict(self):
         self.basics()
         self.clubs()
-        if (self.basics() is True) or (self.clubs() is True):
+        if self.basics() or self.clubs():
             return True
         return False
 
@@ -253,7 +253,7 @@ class Weak(StrengthLevel):
     def verdict(self):
         self.length()
         self.contains()
-        if (self.length() is True) or (self.contains() is True):
+        if self.length() or self.contains():
             return True
         return False
 
@@ -306,7 +306,7 @@ class Decent(StrengthLevel):
 
     def verdict(self):
         self.complexity()
-        if self.complexity() is False:
+        if not self.complexity():
             return True
         return False
 
@@ -335,7 +335,7 @@ class Strong(StrengthLevel):
 
     def verdict(self):
         self.consecutive()
-        if (self.consecutive() is False) and (self.length() is True):
+        if not self.consecutive() and self.length():
             self.feedback_id = 5
         return True
 
@@ -352,7 +352,7 @@ def evaluation(bools, tests):
         logging.error("No valid feedback ID")
         sys.exit("Something ain't right")
 
-    if bools[0] is True:
+    if bools[0]:
         logging.debug(feedback(0))
         print("Password strength: Very weak")
         sportsteam = (
@@ -422,7 +422,7 @@ def evaluation(bools, tests):
                 print("".join(sportsteam))
             case _:
                 error_message()
-    elif bools[1] is True:
+    elif bools[1]:
         logging.debug(feedback(1))
         print("Password strength: Weak")
         match feedback(1):
@@ -445,7 +445,7 @@ def evaluation(bools, tests):
                 print("It is definitely best to avoid this for a number of reasons.")
             case _:
                 error_message()
-    elif bools[2] is True:
+    elif bools[2]:
         logging.debug(feedback(2))
         print("Password strength: OK")
         match feedback(2):
@@ -493,7 +493,7 @@ def evaluation(bools, tests):
                 )
             case _:
                 error_message()
-    elif bools[3] is True:
+    elif bools[3]:
         logging.debug(feedback(3))
         print("Password strength: Strong")
         harvardkey = "It's best to avoid this (Source: HarvardKey)."
@@ -557,9 +557,9 @@ def main():
     password = args.test
 
     fmt = "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s"
-    logging.basicConfig(level=logging.ERROR, format=fmt)
+    logging.basicConfig(level=logging.DEBUG, format=fmt)
 
-    while check_4_lists() is False:
+    while not check_4_lists():
         asyncio.run(collect_lists())
 
     if password is None:
