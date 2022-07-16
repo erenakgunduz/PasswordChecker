@@ -211,8 +211,6 @@ class VeryWeak(StrengthLevel):
         return False
 
     def verdict(self):
-        self.basics()
-        self.clubs()
         if self.basics() or self.clubs():
             return True
         return False
@@ -251,8 +249,6 @@ class Weak(StrengthLevel):
             return False
 
     def verdict(self):
-        self.length()
-        self.contains()
         if self.length() or self.contains():
             return True
         return False
@@ -305,7 +301,6 @@ class Decent(StrengthLevel):
             del p_entropy.string
 
     def verdict(self):
-        self.complexity()
         if not self.complexity():
             return True
         return False
@@ -334,7 +329,6 @@ class Strong(StrengthLevel):
         return False
 
     def verdict(self):
-        self.consecutive()
         if not self.consecutive() and self.length():
             self.feedback_id = 5
         return True
