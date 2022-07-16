@@ -16,6 +16,7 @@ import sportsclubs
 import shutil
 import argparse
 import logging
+import colorama
 
 
 lists = ("lists/passwords.json", "lists/forenames.gz", "lists/surnames.gz")
@@ -346,9 +347,14 @@ def evaluation(bools, tests):
         logging.error("No valid feedback ID")
         sys.exit("Something ain't right")
 
+    def colorize(color, keyword):
+        colorama.init()
+        color = getattr(colorama.Fore, f"{color}")
+        return color + keyword + colorama.Style.RESET_ALL
+
     if bools[0]:
         logging.debug(feedback(0))
-        print("Password strength: Very weak")
+        print(f"Password strength: {colorize('MAGENTA', 'Very weak')}")
         sportsteam = (
             "It seems your password is simply a football or sports club/related to one. This is a bad idea.\n",
             "These were collected from the most common lists for their respective countries.\n",
@@ -418,7 +424,7 @@ def evaluation(bools, tests):
                 error_message()
     elif bools[1]:
         logging.debug(feedback(1))
-        print("Password strength: Weak")
+        print(f"Password strength: {colorize('RED', 'Weak')}")
         match feedback(1):
             case 1.1:
                 print(
@@ -441,7 +447,7 @@ def evaluation(bools, tests):
                 error_message()
     elif bools[2]:
         logging.debug(feedback(2))
-        print("Password strength: OK")
+        print(f"Password strength: {colorize('YELLOW', 'OK')}")
         match feedback(2):
             case 2.1:
                 print("(Maybe)")
@@ -489,7 +495,7 @@ def evaluation(bools, tests):
                 error_message()
     elif bools[3]:
         logging.debug(feedback(3))
-        print("Password strength: Strong")
+        print(f"Password strength: {colorize('GREEN', 'Strong')}")
         harvardkey = "It's best to avoid this (Source: HarvardKey)."
         match feedback(3):
             case 3.1:
