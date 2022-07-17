@@ -25,3 +25,24 @@ results = [(lambda p_test: p_test.verdict())(criteria) for criteria in scenarios
 ```
 
 I am pleased with how efficient and "pythonic" (that's what they call it?) that turned out, and it seems to take on more of a functional and declarative dimension this way also.
+
+## Usage
+
+Requires Python 3.10+. Start by cloning this repository within the directory of your choice:
+
+```bash
+git clone https://github.com/erenakgunduz/PasswordChecker.git
+```
+
+You can simply use the provided pip requirements file to install the necessary packages in the respective virtual environment, after creating and activating one in whichever manner you prefer:
+
+```bash
+cd PasswordChecker
+python3 -m pip install -r requirements.txt
+```
+
+Now you should be all set:
+
+```bash
+python3 passwordtool.py
+```
