@@ -46,3 +46,11 @@ Now you should be all set:
 ```bash
 python3 passwordtool.py
 ```
+
+Note that by default, as a consideration for both security and the end user experience, I have set the logging level to display errors only.
+
+If you would like to see the debug information (was highly useful for me during testing), then all that's necessary is a very simple tweak: (on line 560, use this instead)
+
+```python
+logging.basicConfig(level=logging.DEBUG, format=fmt)
+```
