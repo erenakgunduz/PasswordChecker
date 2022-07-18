@@ -28,7 +28,7 @@ I am pleased with how efficient and "pythonic" (that's what they call it?) that 
 
 ## Usage
 
-Requires Python 3.10+. Start by cloning this repository within the directory of your choice:
+This is a command-line tool that requires Python 3.10+. Start by cloning this repository within the directory of your choice:
 
 ```bash
 git clone https://github.com/erenakgunduz/PasswordChecker.git
@@ -41,7 +41,7 @@ cd PasswordChecker
 python3 -m pip install -r requirements.txt
 ```
 
-Now you should be all set:
+Now you should be all set (use -h/--help for more info):
 
 ```bash
 python3 passwordtool.py
