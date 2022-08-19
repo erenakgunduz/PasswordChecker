@@ -8,9 +8,9 @@ import httpx
 import asyncio
 from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup, SoupStrainer
-from Helpers import findentropy
-from Helpers import scrapehelp
-from Helpers import sportsclubs
+from helpers import findentropy
+from helpers import scrapehelp
+from helpers import sportsclubs
 from getpass import getpass
 import numpy as np
 import shutil
