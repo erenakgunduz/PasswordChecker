@@ -8,11 +8,11 @@ import httpx
 import asyncio
 from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup, SoupStrainer
+from Helpers import findentropy
+from Helpers import scrapehelp
+from Helpers import sportsclubs
 from getpass import getpass
 import numpy as np
-import findentropy
-import scrapehelp
-import sportsclubs
 import shutil
 import argparse
 import logging
