@@ -376,7 +376,7 @@ def evaluation(bools, tests):
             case 0.2:
                 passwd = tests[0].passwd.lower()
                 print(
-                    "Your password is on the 2021 list for the top 200 most common passwords worldwide."
+                    "Your password is on the NordPass list for the top 200 most common passwords worldwide."
                 )
                 print(
                     f"The password '{passwd}' can be cracked in {tests[0].w_passwords[passwd]}!"
