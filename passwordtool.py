@@ -3,7 +3,6 @@ import re
 import sys
 import json
 import lxml
-import cchardet
 import httpx
 import asyncio
 from abc import ABC, abstractmethod
@@ -167,6 +166,7 @@ class VeryWeak(StrengthLevel):
     def basics(self):
         """Does the password fail at any of the most basic considerations?"""
         self.grab()
+
         logging.debug(len(self.w_passwords))
         logging.debug(type(self.w_passwords))
         logging.debug(sportsclubs.teamlist.shape)
