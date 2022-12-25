@@ -1,5 +1,4 @@
 import numpy as np
-import random
 
 lang_list = np.array(["en-US,en;q=0.9", "en-GB,en-US;q=0.9,en;q=0.8"])
 ua_list = np.array(
@@ -14,8 +13,8 @@ ua_list = np.array(
     ]
 )
 
-languages = random.choice(lang_list)
-user_agent = random.choice(ua_list)
+languages = np.random.choice(lang_list)
+user_agent = np.random.choice(ua_list)
 
 headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
