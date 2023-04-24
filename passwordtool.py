@@ -1,22 +1,20 @@
+import argparse
+import asyncio
+import json
+import logging
 import os
 import re
-import sys
-import json
-import lxml
-import httpx
-import asyncio
-from abc import ABC, abstractmethod
-from bs4 import BeautifulSoup, SoupStrainer
-from helpers import findentropy
-from helpers import scrapehelp
-from helpers import sportsclubs
-from getpass import getpass
-import numpy as np
 import shutil
-import argparse
-import logging
-import colorama
+import sys
+from abc import ABC, abstractmethod
+from getpass import getpass
 
+import colorama
+import httpx
+import numpy as np
+from bs4 import BeautifulSoup, SoupStrainer
+
+from helpers import findentropy, scrapehelp, sportsclubs
 
 lists = ("lists/passwords.json", "lists/forenames.gz", "lists/surnames.gz")
 affirm = ("yes", "yeah", "yea", "y")
