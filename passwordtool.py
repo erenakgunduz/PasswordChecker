@@ -153,7 +153,7 @@ class StrengthLevel(ABC):
         self.surnames = self.formatter(self.surnames)
 
     @abstractmethod
-    def verdict(self):
+    def verdict(self) -> bool:
         pass
 
 
