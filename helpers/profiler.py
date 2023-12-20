@@ -1,8 +1,9 @@
-from os import getcwd
+import asyncio
 import cProfile
 import pstats
+from os import getcwd
+
 import passwordtool
-import asyncio
 
 
 def main():

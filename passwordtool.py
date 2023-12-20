@@ -45,7 +45,7 @@ def check_4_lists():
 
 async def collect_lists():
     urls = (
-        "https://nordpass.com/json-data/top-worst-passwords/findings/all.json",
+        "https://nordpass.com/json-data/top-worst-passwords/findings/2023/all.json",
         "https://forebears.io/earth/forenames",
         "https://forebears.io/earth/surnames",
     )
@@ -137,6 +137,7 @@ class StrengthLevel(ABC):
         with open(lists[0], "r") as f:
             self.w_passwords = f.read()
         self.w_passwords = json.loads(self.w_passwords)
+        logging.warning(type(self.w_passwords))
         self.forenames = np.loadtxt(lists[1], delimiter="\t", dtype=str)
         self.surnames = np.loadtxt(lists[2], delimiter="\t", dtype=str)
 
@@ -157,9 +158,12 @@ class StrengthLevel(ABC):
 
 
 class VeryWeak(StrengthLevel):
-    def __init__(self, passwd):
-        super().__init__(passwd)
+    def __init__(self, passwd, w_passwords=None, forenames=None, surnames=None):
+        super().__init__(passwd, w_passwords, forenames, surnames)
         self.feedback_id = 0
+        self.w_passwords: dict = self.w_passwords
+        self.forenames: np.ndarray = self.forenames
+        self.surnames: np.ndarray = self.surnames
 
     def basics(self):
         """Does the password fail at any of the most basic considerations?"""
@@ -198,7 +202,7 @@ class VeryWeak(StrengthLevel):
             match self.passwd.lower():
                 case "tottenham" | "tottenham1":
                     self.feedback_id = 0.4
-                case "liverpool1":
+                case "liverpool" | "liverpool1":
                     self.feedback_id = 0.5
                 case "arsenal" | "arsenal1":
                     self.feedback_id = 0.6
@@ -399,7 +403,7 @@ def evaluation(bools, tests):
             case 0.5:
                 print("".join(sportsteam))
                 print(
-                    f"'{sportsclubs.teamlist[0]}' in particular is one of the top 200 most common passwords in the entire world!"
+                    f"In fact '{sportsclubs.teamlist[0]}' was one of the top 200 most common passwords in the world not long ago!"
                 )
                 print(
                     "YNWA, because you alone won't be accessing your accounts if that's actually your password for anything ;D"

@@ -1,5 +1,5 @@
-from functools import cache
 import math
+from functools import cache
 
 
 class EntropyCalculate:
