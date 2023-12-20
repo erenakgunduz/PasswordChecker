@@ -158,8 +158,8 @@ class StrengthLevel(ABC):
 
 
 class VeryWeak(StrengthLevel):
-    def __init__(self, passwd, w_passwords=None, forenames=None, surnames=None):
-        super().__init__(passwd, w_passwords, forenames, surnames)
+    def __init__(self, passwd):
+        super().__init__(passwd)
         self.feedback_id = 0
         self.w_passwords: dict = self.w_passwords
         self.forenames: np.ndarray = self.forenames
