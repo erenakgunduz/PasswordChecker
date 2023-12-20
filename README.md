@@ -18,7 +18,7 @@ for criteria in scenarios:
     results.append(strength_checker(criteria))
 ```
 
-Using just this one line (line 585):
+Using just this one line (line 587):
 
 ```python
 results = [(lambda p_test: p_test.verdict())(criteria) for criteria in scenarios]
@@ -51,7 +51,7 @@ python3 passwordtool.py
 
 Note that by default, as a consideration for both security and the end user experience, I have set the logging level to display errors only.
 
-If you would like to see the debug information (was highly useful for me during testing), then all that's necessary is a very simple tweak: (on line 560, use this instead)
+If you would like to see the debug information (was highly useful for me during testing), then all that's necessary is a very simple tweak: (on line 562, use this instead)
 
 ```python
 logging.basicConfig(level=logging.DEBUG, format=fmt)
