@@ -45,7 +45,7 @@ def check_4_lists():
 
 async def collect_lists():
     urls = (
-        "https://nordpass.com/json-data/top-worst-passwords/findings/2023/all.json",
+        "https://nordpass.com/next/worst-passwords-list/2024/b2c/all.json",
         "https://forebears.io/earth/forenames",
         "https://forebears.io/earth/surnames",
     )
